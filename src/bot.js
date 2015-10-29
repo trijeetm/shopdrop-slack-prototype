@@ -90,22 +90,28 @@ var createGroup = function*(m, mentorId) {
       mentee = member;
     }
   });
-  var name = `${mentor.name}-${mentee.name}`;
-  var groups = (yield api.slackApi("groups.list")).groups;
+  var groups = (yield api.slackApi("mpim.list")).groups;
   var group = null;
   var existing = false;
   for (var i = 0; i < groups.length; i++) {
-    if (name.indexOf(groups[i].name) === 0) {
+    if (groups[i].members.indexOf(mentor.id) !== -1 && groups[i].members.indexOf(mentee.id) !== -1) {
       group = groups[i];
       existing = true;
       break;
     }
   }
   if (!group) {
-    group = (yield api.slackApi("groups.create", {name: name})).group;
+    group = (yield api.slackApi("mpim.open", {
+      users: [mentor.id, mentee.id].join(",")
+    })).group;
   }
   var id = group.id;
   if (!existing) {
+    yield api.slackApi("chat.postMessage", {
+      channel: id,
+      as_user: true,
+      text: `<!group>, y'all have been matched again! This time the question was: *${text}*`
+    });
     yield [
       api.slackApi("groups.setPurpose", {
         channel: id,
