@@ -35,18 +35,16 @@ api.on("command", function*(data, res) {
       }
     ])
   });
-  yield [
-    api.slackApi("reactions.add", {
-      channel: mentorPost.channel,
-      timestamp: mentorPost.ts,
-      name: "raising_hand"
-    }),
-    api.slackApi("reactions.add", {
-      channel: mentorPost.channel,
-      timestamp: mentorPost.ts,
-      name: "x"
-    })
-  ]
+  yield api.slackApi("reactions.add", {
+    channel: mentorPost.channel,
+    timestamp: mentorPost.ts,
+    name: "raising_hand"
+  });
+  yield api.slackApi("reactions.add", {
+    channel: mentorPost.channel,
+    timestamp: mentorPost.ts,
+    name: "x"
+  });
 });
 
 var allTags = [];
