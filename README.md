@@ -4,16 +4,18 @@ This is an experimental (read: not quite production-ready) version of TreeHacks'
 
 Why Slack? Communication is a huge problem at hackathons, and Slack gives us a really nice unified communications platform, including announcements, feedback, volunteer communication, hacker questions, sponsor relations, hacker-to-hacker community chat, and now, mentorship. Plus, we get configurable mobile and email notifications for free.
 
-Note that this is still pretty hacky. It works well in our manual tests, but it's undocumented, has no automted testing, and utilizes some private API's. Use at your own risk, yada yada yada. That said, we're committed to making this really awesome, and we'd love all the help we can get - Pull Requests welcome! We'd be delighted if this got used at other events, and if you need any kind of help setting it up, shoot an email to `rpalefsk@stanford.edu`.
+Note that this is still pretty hacky. It works well in our manual tests, but it's undocumented, has no automated testing, and utilizes some private API's. Use at your own risk, yada yada yada. That said, we're committed to making this really awesome, and we'd love all the help we can get - Pull Requests welcome! We'd be delighted if this got used at other events, and if you need any kind of help setting it up, shoot an email to `rpalefsk@stanford.edu`.
 
 The system is a basically Hacker News distilled into one repo - it's built with node.js, ES6 (via Babel), React, and Material Design. The app is split into two components: Mentorbot (bot) and Mentor Dashboard (dash). They share a lot of code and complement one another, but they each work perfectly fine on their own, so we'll explain them separately.
 
 ### Mentorbot (bot)
-This is the heart of the mentorship system. This code (located in `src/bot.js`) implements a flow that sounds pretty complicated, but once you try it out, is actually pretty slick. Here's how it all works:
-1) Invite mentors to a private mentorship group (we use `#mentors`). This is nice, since it requires no database, no sign-up process, and no lists. Getting a mentor set up is as simple as `/invite @mentor-username`. The room will auto-delete any non-bot posts to keep it clean for tickets (explained below).
-2) Hackers request help in plain English using the `/mentor` slash command  from anywhere inside Slack. Example: `/mentor I need help understanding "this" in javascript`
-3) The question is posted inside the `#mentors` group, and any mentor can claim it by tapping the 🙋emoji reaction. Here's what it looks like: ![mentor screenshot](http://i.imgur.com/UA6O2A4.png)
-4) Once a mentor claims the ticket, it's deleted from the mentor room. Then, the mentor and hacker are invited to a private chat to discuss the issue and hopefully meet up. That's it!
+This is the heart of the mentorship system. This code (located in `src/bot.js`) implements a flow that sounds pretty complicated, but once you try it out, is actually pretty slick. Here's how it all works: 
+
+1. Invite mentors to a private mentorship group (we use `#mentors`). This is nice, since it requires no database, no sign-up process, and no lists. Getting a mentor set up is as simple as `/invite @mentor-username`. The room will auto-delete any non-bot posts to keep it clean for tickets (explained below). 
+2. Hackers request help in plain English using the `/mentor` slash command  from anywhere inside Slack. Example: `/mentor I need help understanding "this" in javascript`  
+3. The question is posted inside the `#mentors` group, and any mentor can claim it by tapping the 🙋emoji reaction. Here's what it looks like:  
+![mentor screenshot](http://i.imgur.com/UA6O2A4.png)  
+4. Once a mentor claims the ticket, it's deleted from the mentor room. Then, the mentor and hacker are invited to a private chat to discuss the issue and hopefully meet up. That's it!
 
 This has a couple advantages. It works accross phones and laptops, with nice notifications via push or email. It also requires no database (fewer dependencies!), relying solely on Slack to make it all happen. In the future, we might add a DB for metrics and such, but it's not required.
 
@@ -36,7 +38,8 @@ The backend automatically sets the mentor's highlight words, including all relev
 * Admin account on your Slack instance.
 
 ## File structure
-Here's how everyting is laid out. You don't need to know any of this to get it running, but if you need to monkey around in the source, it's good to know.
+Here's how everyting is laid out. You don't need to know any of this to get it running, but if you need to monkey around in the source, it's good to know.  
+
 File  | Purpose
 ------------- | -------------
 `public/index.html`  | The mentor dashboard
@@ -62,7 +65,7 @@ To configure everything for your specific Slack, follow the instructions inside 
 Don't worry, it's all in that file. Once you're done, run `mv sample-config.js config.js`, since the code expects that filename. Note that `config.js` will be gitignored so you don't accidentally leak your secrets.
 
 ## Running
-1) `cd` into the top-level folder (`slack-mentorship` if you cloned from github)
-2) `npm install`
-3) `npm run build` (this compiles the frontend javascript. Make sure to re-run this anytime you make changes)
-4) `node index.js`
+1. `cd` into the top-level folder (`slack-mentorship` if you cloned from github)  
+2. `npm install`  
+3. `npm run build` (this compiles the frontend javascript. Make sure to re-run this anytime you make changes)  
+4. `node index.js`  

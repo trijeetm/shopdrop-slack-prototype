@@ -13,19 +13,25 @@ api.listenForCommands("/commands", bot_port);
 api.startConnection();
 
 api.on("command", function*(data, res) {
+  if (!data.text) {
+    res.send("Please add a description of your problem, like /mentor how can I use an API?");
+    return;
+  }
   res.send("Your question has been submitted to the mentors! We'll let you know when someone's on it.");
   var userInfo = yield api.slackApi("users.info", {user: data.user_id});
   var name = userInfo.user.profile.real_name;
   var image = userInfo.user.profile.image_24;
   var mentorPost = yield api.slackApi("chat.postMessage", {
-    channel: "mentors",
+    channel: mentor_group_name,
     as_user: true,
+    text: "Hit the (:raising_hand: 1) below to claim this ticket and auto-open a PM with the hacker:",
+
     attachments: JSON.stringify([
       {
         fallback: `${data.user_name} asked: ${data.text}`,
         author_name: `${name} (${data.user_name})`,
         author_icon: image,
-        text: tagify(data.text)
+        text: data.text,
       }
     ])
   });
@@ -100,44 +106,32 @@ var createGroup = function*(m, mentorId) {
       break;
     }
   }
+
   if (!group) {
     group = (yield api.slackApi("mpim.open", {
       users: [mentor.id, mentee.id].join(",")
     })).group;
   }
+
   var id = group.id;
   if (!existing) {
     yield api.slackApi("chat.postMessage", {
       channel: id,
       as_user: true,
-      text: `<!group>, y'all have been matched again! This time the question was: *${text}*`
-    });
-    yield [
-      api.slackApi("groups.setPurpose", {
-        channel: id,
-        purpose: `Hey ${mentee.profile.first_name}, meet your mentor ${mentor.profile.first_name}! You're welcome to keep it digital here, but we encourage you to meet up and debug face to face! Your question was: ${text}`
-      }),
-      api.slackApi("groups.invite", {
-        channel: id,
-        user: mentor.id
-      }),
-      api.slackApi("groups.invite", {
-        channel: id,
-        user: mentee.id
-      })
-    ]
+      text: `(<!group>) Hey ${mentee.profile.first_name || mentee.name}, meet your mentor ${mentor.profile.first_name || mentor.name}! You're welcome to keep it digital here, but we encourage you to meet up and debug face to face! The question was:\n>${text.replace("\n", "\n>")}`
+    })
   } else {
     yield api.slackApi("chat.postMessage", {
       channel: id,
       as_user: true,
-      text: `<!group>, y'all have been matched again! This time the question was: *${text}*`
+      text: `<!group>, y'all have been matched again! This time the question was:\n>${text.replace("\n", "\n>")}`
     });
   }
 };
 
 
 var onChannelDelete = function*(m) {
-  yield api.slackApi("chat.delete", {
+  api.slackApi("chat.delete", {
     channel: m.channel,
     ts: m.ts,
     token: admin_token
@@ -157,7 +151,7 @@ var mentorGroupId = api.slackApi("groups.list")
 });
 
 api.on("message", function*(m) {
-  if (m.type === "reaction_added") {
+  if (m.type === "reaction_added" && m.item.channel === (yield mentorGroupId)) {
     yield onReactionAdded(m);
   }
   if (m.type === "message" &&

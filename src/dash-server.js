@@ -43,7 +43,7 @@ app.get("/oauth", (req, res) => {
 
 app.use((req, res, next) => {
   if (!req.session.token) {
-    var url = `https://slack.com/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&state=foo`;
+    var url = `https://slack.com/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&state=foo&scope=identify`;
     if (!req.query.noteam) {
       url = `${url}&team=${team_id}`
     }
