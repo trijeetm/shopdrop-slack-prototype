@@ -24,7 +24,7 @@ api.on("command", function*(data, res) {
   var mentorPost = yield api.slackApi("chat.postMessage", {
     channel: mentor_group_name,
     as_user: true,
-    text: "Hit the (:raising_hand: 1) below to claim this ticket and auto-open a PM with the hacker:",
+    text: "Hit the (:raising_hand: 1) below to claim this ticket and auto-open a PM with the hacker, or (:x: 1) to mark as duplicate/irrelevant:",
 
     attachments: JSON.stringify([
       {
@@ -35,11 +35,18 @@ api.on("command", function*(data, res) {
       }
     ])
   });
-  yield api.slackApi("reactions.add", {
-    channel: mentorPost.channel,
-    timestamp: mentorPost.ts,
-    name: "raising_hand"
-  });
+  yield [
+    api.slackApi("reactions.add", {
+      channel: mentorPost.channel,
+      timestamp: mentorPost.ts,
+      name: "raising_hand"
+    }),
+    api.slackApi("reactions.add", {
+      channel: mentorPost.channel,
+      timestamp: mentorPost.ts,
+      name: "x"
+    })
+  ]
 });
 
 var allTags = [];
@@ -62,8 +69,7 @@ var deleted = {};
 
 var onReactionAdded = function*(m) {
   if (m.user === api.selfId) return;
-  if (m.reaction !== "raising_hand") return;
-  if (m.reaction !== "raising_hand") return;
+  if (m.reaction !== "raising_hand" && m.reaction !== "x") return;
   if (m.item.ts in deleted) return;
   deleted[m.item.ts] = true;
   var toDelete = (yield api.slackApi("groups.history", {
@@ -77,7 +83,9 @@ var onReactionAdded = function*(m) {
     ts: m.item.ts,
     token: admin_token
   });
-  yield createGroup(toDelete, m.user);
+  if (m.reaction === "raising_hand") {
+    yield createGroup(toDelete, m.user);
+  }
   delete deleted[m.item.ts];
 };
 
@@ -109,6 +117,7 @@ var createGroup = function*(m, mentorId) {
   if (mentor.id == mentee.id) {
     yield api.slackApi("chat.postMessage", {
       channel: mentor.id,
+      username: "mentorbot",
       // as_user: true,
       text: `Glad you could answer your own question!`
     })
