@@ -106,6 +106,14 @@ var createGroup = function*(m, mentorId) {
       break;
     }
   }
+  if (mentor.id == mentee.id) {
+    yield api.slackApi("chat.postMessage", {
+      channel: mentor.id,
+      // as_user: true,
+      text: `Glad you could answer your own question!`
+    })
+    return;
+  }
 
   if (!group) {
     group = (yield api.slackApi("mpim.open", {
