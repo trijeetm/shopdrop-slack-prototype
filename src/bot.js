@@ -111,9 +111,9 @@ var onReactionAdded = function*(m) {
   });
   if (m.reaction === "raising_hand") {
     yield createGroup(toDelete, m.user);
-    logClaim(m.item.ts, yield getUser(m.user).name);
+    logClaim(m.item.ts, yield getUser({id: m.user}).name);
   } else {
-    logDelete(m.item.ts, yield getUser(m.user).name);
+    logDelete(m.item.ts, yield getUser({id: m.user}).name);
   }
   delete deleted[m.item.ts];
 };
