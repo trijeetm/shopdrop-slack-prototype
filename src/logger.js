@@ -69,6 +69,3 @@ exports.logDelete = function(ts, mentor) {
 		]);
 	});
 };
-
-exports.logClaim("456", "@raphie").done();
-
