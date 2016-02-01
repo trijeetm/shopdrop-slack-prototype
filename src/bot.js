@@ -68,6 +68,28 @@ var tagify = (str) => {
   });
 };
 
+var usernameCache = {};
+var userIDCache = {};
+
+var getUser = function*(info) {
+  if (info.id && info.id in userIDCache) {
+    return userIDCache[info.id];
+  }
+  if (info.username && info.username in usernameCache) {
+    return usernameCache[info.username];
+  }
+  var members = (yield api.slackApi("users.list")).members;
+  members.forEach((member) => {
+    userIDCache[member.id] = member;
+    usernameCache[member.name] = member;
+  });
+  if (info.id) {
+    return userIDCache[info.id];
+  }
+  if (info.username) {
+    return userIDCache[info.username];
+  }
+}
 
 var deleted = {};
 
@@ -88,10 +110,10 @@ var onReactionAdded = function*(m) {
     token: admin_token
   });
   if (m.reaction === "raising_hand") {
-    logClaim(m.item.ts, m.user);
     yield createGroup(toDelete, m.user);
+    logClaim(m.item.ts, yield getUser(m.user).name);
   } else {
-    logDelete(m.item.ts, m.user);
+    logDelete(m.item.ts, yield getUser(m.user).name);
   }
   delete deleted[m.item.ts];
 };
@@ -100,17 +122,8 @@ var createGroup = function*(m, mentorId) {
   var attachment = m.attachments[0];
   var text = attachment.text;
   var menteeUsername = attachment.author_name.match(/\((.*)\)/)[1];
-  var mentor;
-  var mentee;
-  var members = (yield api.slackApi("users.list")).members;
-  members.forEach((member) => {
-    if (member.id === mentorId) {
-      mentor = member;
-    }
-    if (member.name === menteeUsername) {
-      mentee = member;
-    }
-  });
+  var mentor = yield getUser({id: mentorID});
+  var mentee = yield getUser({username: menteeUsername});
   var groups = (yield api.slackApi("mpim.list")).groups;
   var group = null;
   var existing = false;
