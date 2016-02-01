@@ -7,6 +7,11 @@ import {
   bot_port,
   mentor_group_name,
 } from "../config";
+import {
+  logQuestion,
+  logClaim,
+  logDelete,
+} from "./logger.js";
 
 var api = new Slack(bot_token)
 api.listenForCommands("/commands", bot_port);
@@ -35,6 +40,7 @@ api.on("command", function*(data, res) {
       }
     ])
   });
+  logQuestion(mentorPost.ts, data.text, data.user_name);
   yield api.slackApi("reactions.add", {
     channel: mentorPost.channel,
     timestamp: mentorPost.ts,
@@ -82,7 +88,10 @@ var onReactionAdded = function*(m) {
     token: admin_token
   });
   if (m.reaction === "raising_hand") {
+    logClaim(m.item.ts, m.user);
     yield createGroup(toDelete, m.user);
+  } else {
+    logDelete(m.item.ts, m.user);
   }
   delete deleted[m.item.ts];
 };

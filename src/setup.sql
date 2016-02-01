@@ -1,0 +1,22 @@
+CREATE TABLE slackuser(
+	id	VARCHAR(21)		PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE question(
+	id			VARCHAR(17) 	PRIMARY KEY NOT NULL,
+	content		TEXT			NOT NULL,
+	mentee		VARCHAR(21)		REFERENCES slackuser(id) NOT NULL,
+	time		TIMESTAMPTZ		NOT NULL
+);
+
+CREATE TABLE claim(
+	question	VARCHAR(17)		REFERENCES question(id) NOT NULL,
+	mentor		VARCHAR(21)		REFERENCES slackuser(id) NOT NULL,
+	time		TIMESTAMPTZ		NOT NULL
+);
+
+CREATE TABLE delete(
+	question	VARCHAR(17)		REFERENCES question(id) NOT NULL,
+	mentor		VARCHAR(21)		REFERENCES slackuser(id) NOT NULL,
+	time		TIMESTAMPTZ		NOT NULL
+);
