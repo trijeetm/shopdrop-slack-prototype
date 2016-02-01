@@ -60,6 +60,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.post("/highlight", (req, res) => {
+  return res.send("sup");
   api.slackApi(`users.prefs.set?t=${Date.now()}`, {
     name: "highlight_words",
     token: req.session.token,
@@ -90,6 +91,8 @@ var getPrefs = (token) => {
 }
 
 app.get("/highlights", (req, res) => {
+  res.json([]);
+  return;
   getPrefs(req.session.token)
   .then()
   .then((resp) => {

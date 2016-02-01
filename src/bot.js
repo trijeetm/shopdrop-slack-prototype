@@ -176,3 +176,7 @@ api.on("message", function*(m) {
     yield onChannelDelete(m);
   }
 });
+
+var updateLeaderboard = function*(channel, answerer) {
+
+}

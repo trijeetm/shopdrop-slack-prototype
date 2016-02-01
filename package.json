@@ -24,6 +24,7 @@
     "compression": "^1.5.2",
     "express": "^4.13.3",
     "express-session": "^1.11.3",
+    "pg": "^4.4.4",
     "q": "^1.4.1",
     "react": "^0.13.3",
     "requestretry": "^1.4.0",
