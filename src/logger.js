@@ -1,27 +1,25 @@
 import pg from "pg";
+import query from "pg-query";
 import Q from "q";
 import {
   pg_url,
 } from "../config";
 
-var client = new pg.Client(pg_url);
-client.connect();
+
+query.connectionParameters = pg_url
 
 
-var query = function(text, values=[]) {
+var queryP = function(text, values=[]) {
 	return Q.Promise((resolve, reject) => {
 		console.log({
 			text: text,
 			values: values
 		})
-		client.query({
-			text: text,
-			values: values
-		}, function(err, res) {
+		query(text, values, function(err, rows, result) {
 			if (err) {
 				reject(err);
 			} else {
-				resolve(res.rows);
+				resolve(rows);
 			}
 		})
 	});
@@ -36,13 +34,13 @@ var prefix = function(user) {
 
 var upsertUser = function(user) {
 	var text = "INSERT INTO slackuser (id) SELECT $1::varchar WHERE NOT EXISTS (SELECT 1 FROM slackuser WHERE id = $1::varchar);";
-	return query(text, [user]);
+	return queryP(text, [user]);
 };
 
 exports.logQuestion = function(ts, content, mentee) {
 	mentee = prefix(mentee);
 	return upsertUser(mentee).then(r => {
-		return query("INSERT INTO question VALUES ($1, $2, $3, timezone('PST'::text, now()))", [
+		return queryP("INSERT INTO question VALUES ($1, $2, $3, timezone('PST'::text, now()))", [
 			ts,
 			content,
 			mentee,
@@ -53,7 +51,7 @@ exports.logQuestion = function(ts, content, mentee) {
 exports.logClaim = function(ts, mentor) {
 	mentor = prefix(mentor);
 	return upsertUser(mentor).then(r => {
-		return query("INSERT INTO claim VALUES ($1, $2, timezone('PST'::text, now()))", [
+		return queryP("INSERT INTO claim VALUES ($1, $2, timezone('PST'::text, now()))", [
 			ts,
 			mentor,
 		]);
@@ -63,7 +61,7 @@ exports.logClaim = function(ts, mentor) {
 exports.logDelete = function(ts, mentor) {
 	mentor = prefix(mentor);
 	return upsertUser(mentor).then(r => {
-		return query("INSERT INTO delete VALUES ($1, $2, timezone('PST'::text, now()))", [
+		return queryP("INSERT INTO delete VALUES ($1, $2, timezone('PST'::text, now()))", [
 			ts,
 			mentor,
 		]);
