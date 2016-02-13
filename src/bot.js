@@ -126,6 +126,7 @@ var createGroup = function*(m, mentorId) {
   console.log(m, mentorId,menteeUsername);
   var mentor = yield getUser({id: mentorId});
   var mentee = yield getUser({username: menteeUsername});
+  console.log(mentor, mentee);
   var groups = (yield api.slackApi("mpim.list")).groups;
   var group = null;
   var existing = false;
