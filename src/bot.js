@@ -72,6 +72,7 @@ var usernameCache = {};
 var userIDCache = {};
 
 var getUser = function*(info) {
+  console.log(info);
   if (info.id && info.id in userIDCache) {
     return userIDCache[info.id];
   }
@@ -122,6 +123,7 @@ var createGroup = function*(m, mentorId) {
   var attachment = m.attachments[0];
   var text = attachment.text;
   var menteeUsername = attachment.author_name.match(/\((.*)\)/)[1];
+  console.log(m, mentorId,menteeUsername);
   var mentor = yield getUser({id: mentorId});
   var mentee = yield getUser({username: menteeUsername});
   var groups = (yield api.slackApi("mpim.list")).groups;
