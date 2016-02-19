@@ -1,1 +1,1 @@
-We're currently making a lot of changes here, so stay tuned until after TreeHacks!
+Slackbot for shopdrop prototype
