@@ -39,9 +39,14 @@ exports.mentor_group_name = "mentors";
 */
 exports.bot_port = 3000;
 
+/*
+** To log stats and such, you should set up a heroku postgres
+** instance and paste the URL it gives you here
+*/ 
+exports.pg_url = "REPLACE ME";
 
 /*
-** DASH CONFIG
+** DASH CONFIG (DEPRECATED DON'T DO THIS ANYMORE)
 */
 
 
