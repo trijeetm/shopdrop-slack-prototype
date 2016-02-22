@@ -1,5 +1,5 @@
 /*
-** MENTORBOT CONFIG
+** SHOPDROP CONFIG
 */
 
 /*
