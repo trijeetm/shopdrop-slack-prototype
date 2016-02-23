@@ -19,17 +19,17 @@ api.startConnection();
 
 api.on("command", function*(data, res) {
   if (!data.text) {
-    res.send("Please add a description of your problem, like /mentor how can I use an API?");
+    res.send("Please add a description of your request, like /shop one chipotle burrito with chicken");
     return;
   }
-  res.send("Your question has been submitted to the mentors! We'll let you know when someone's on it.");
+  res.send("Your request has been submitted to shopdrop! We'll let you know when a dropper's on it.");
   var userInfo = yield api.slackApi("users.info", {user: data.user_id});
   var name = userInfo.user.profile.real_name;
   var image = userInfo.user.profile.image_24;
   var mentorPost = yield api.slackApi("chat.postMessage", {
     channel: mentor_group_name,
     as_user: true,
-    text: "Hit the (:raising_hand: 1) below to claim this ticket and auto-open a PM with the hacker, or (:x: 1) to mark as duplicate/irrelevant:",
+    text: "Hit the (:raising_hand: 1) below to claim this request and start a PM with the requester, or (:x: 1) to mark as duplicate/irrelevant:",
 
     attachments: JSON.stringify([
       {
@@ -113,7 +113,8 @@ var onReactionAdded = function*(m) {
   if (m.reaction === "raising_hand") {
     yield createGroup(toDelete, m.user);
     logClaim(m.item.ts, (yield getUser({id: m.user})).name);
-  } else {
+  } 
+  else {
     logDelete(m.item.ts, (yield getUser({id: m.user})).name);
   }
   delete deleted[m.item.ts];
@@ -140,9 +141,9 @@ var createGroup = function*(m, mentorId) {
   if (mentor.id == mentee.id) {
     yield api.slackApi("chat.postMessage", {
       channel: mentor.id,
-      username: "mentorbot",
+      username: "shopdrop",
       // as_user: true,
-      text: `Glad you could answer your own question!`
+      text: `Glad you could satisfy your own request!`
     })
     return;
   }
@@ -158,13 +159,13 @@ var createGroup = function*(m, mentorId) {
     yield api.slackApi("chat.postMessage", {
       channel: id,
       as_user: true,
-      text: `(<!group>) Hey ${mentee.profile.first_name || mentee.name}, meet your mentor ${mentor.profile.first_name || mentor.name}! You're welcome to keep it digital here, but we encourage you to meet up and debug face to face! The question was:\n>${text.replace("\n", "\n>")}`
+      text: `(<!group>) Hey ${mentee.profile.first_name || mentee.name}, meet your dropper ${mentor.profile.first_name || mentor.name}! You can discuss details here like dropoff time, where to dropff, and payment. The request was:\n>${text.replace("\n", "\n>")}`
     })
   } else {
     yield api.slackApi("chat.postMessage", {
       channel: id,
       as_user: true,
-      text: `<!group>, y'all have been matched again! This time the question was:\n>${text.replace("\n", "\n>")}`
+      text: `<!group>, You two have been matched again! This time the request was:\n>${text.replace("\n", "\n>")}`
     });
   }
 };
